@@ -348,11 +348,11 @@ if __name__ == "__main__":
     for edge in v2.getOutEdges():
         print edge
     #Indexes
-    i1 = g.getIndex('sylva_nodes', "VERTICES")
     i1 = g.createAutomaticIndex('testIndex', 'VERTICES')
     i2 = g.createAutomaticIndex('testIndex2', 'EDGES')
     for index in g.getIndices():
         print index
+    i1 = g.getIndex('testIndex', "VERTICES")
     print i1.getIndexName()
     print i1.getIndexClass()
     print i1.getIndexType()
