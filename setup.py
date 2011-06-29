@@ -35,7 +35,7 @@ setup(
     keywords="""property graph model interface graphdb graphdatabase
                 database blueprints orientdb neo4j""",
     classifiers=[
-        'Development Status :: 1 - Alpha',
+        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Operating System :: OS Independent',
