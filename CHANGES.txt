@@ -1,0 +1,6 @@
+Changes
+-------
+
+0.1 (2011-06-29)
+----------------
+- First Python Index Package release.
