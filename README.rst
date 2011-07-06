@@ -11,6 +11,10 @@ implementations for the different graph database engines.
 Features
 --------
 
-This is an experimental version only permitting partial functionality to
-the Neo4j database providing abstraction over the neo4j-rest-client API.
+This is an experimental version only permitting partial functionality to:
+
+ - Rexster infrastructure, supporting every database supported by Rexster (https://github.com/tinkerpop/rexster/)
+ - Neo4j database providing abstraction over the neo4j-rest-client API.
+
+
 Please keep in mind to backup your data before trying this library.
