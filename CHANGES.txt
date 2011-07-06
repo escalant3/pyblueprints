@@ -1,6 +1,14 @@
 Changes
 -------
 
+0.2.1 (2011-07-06)
+------------------
+- Updated documentation
+
+0.2 (2011-07-06)
+----------------
+- Added integration with python-rexster
+
 0.1 (2011-06-29)
 ----------------
 - First Python Index Package release.
