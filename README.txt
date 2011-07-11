@@ -12,8 +12,9 @@ Features
 --------
 
 This is an experimental version only permitting partial functionality to:
-- Rexster infrastructure, supporting every database supported by Rexster (https://github.com/tinkerpop/rexster/)
-- Neo4j database providing abstraction over the neo4j-rest-client API.
+
+ - Rexster infrastructure, supporting every database supported by Rexster (https://github.com/tinkerpop/rexster/)
+ - Neo4j database providing abstraction over the neo4j-rest-client API.
 
 
 Installation

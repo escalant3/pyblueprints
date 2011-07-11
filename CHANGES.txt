@@ -1,6 +1,10 @@
 Changes
 -------
 
+0.2.2 (2011-07-11)
+------------------
+- Added basic installation and usage documentation
+
 0.2.1 (2011-07-06)
 ------------------
 - Updated documentation
