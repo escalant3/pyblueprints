@@ -1,6 +1,13 @@
 Changes
 -------
 
+0.3 (2011-07-12)
+----------------
+- Added unittests
+- Added getEdge, removeProperty and getBothEdges methods
+- Returning None in NotFoundErrors instead of raising exception
+- Bugfixes
+
 0.2.2 (2011-07-11)
 ------------------
 - Added basic installation and usage documentation
