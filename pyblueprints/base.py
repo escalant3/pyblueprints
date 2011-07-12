@@ -45,9 +45,8 @@ class Graph():
         @params vertex: Node to be removed"""
         raise NotImplementedError("Method has to be implemented")
 
-    def addEdge(self, _id, outVertex, inVertex, label):
+    def addEdge(self, outVertex, inVertex, label):
         """Creates a new edge
-        @params _id: Edge unique identifier
         @params outVertex: Edge origin Vertex
         @params inVertex: Edge target vertex
         @params label: Edge label

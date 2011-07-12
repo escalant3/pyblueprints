@@ -13,14 +13,14 @@
 # File: pyblueprints/neo4j.py                                       #
 #####################################################################
 
-import neo4jrestclient
+from neo4jrestclient import client 
 from base import Graph
 
 
 class Neo4jGraph(Graph):
 
     def __init__(self, host):
-        self.neograph = neo4jrestclient.GraphDatabase(host)
+        self.neograph = client.GraphDatabase(host)
 
     def addVertex(self, _id=None):
         """Add param declared for compability with the API. Neo4j
@@ -48,9 +48,8 @@ class Neo4jGraph(Graph):
         @params vertex: Node to be removed"""
         vertex.neoelement.delete()
 
-    def addEdge(self, _id, outVertex, inVertex, label):
+    def addEdge(self, outVertex, inVertex, label):
         """Creates a new edge
-        @params _id: Edge unique identifier
         @params outVertex: Edge origin Vertex
         @params inVertex: Edge target vertex
         @params label: Edge label
