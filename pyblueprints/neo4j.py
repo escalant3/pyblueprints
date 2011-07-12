@@ -69,7 +69,7 @@ class Neo4jGraph(Graph):
 
         @returns The requested Edge or None"""
         try:
-            edge = self.neograph.nodes.get(_id)
+            edge = self.neograph.relationships.get(_id)
         except client.NotFoundError:
             return None
         return Edge(edge)
@@ -113,7 +113,7 @@ class Element():
         """Returns a set with the property keys of the element
 
         @returns Set of property keys"""
-        return set(self.neoelement.properties.keys())
+        return self.neoelement.properties.keys()
 
     def setProperty(self, key, value):
         """Sets the property of the element to the given value
@@ -126,6 +126,11 @@ class Element():
 
         @returns The unique identifier of the element"""
         return self.neoelement.id
+
+    def removeProperty(self, key):
+        """Removes the value of the property for the given key
+        @params key: The key which value is being removed"""
+        self.neoelement.properties.pop(key)
 
 
 class Vertex(Element):
