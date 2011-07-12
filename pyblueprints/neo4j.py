@@ -72,7 +72,7 @@ class Neo4jGraph(Graph):
             edge = self.neograph.nodes.get(_id)
         except client.NotFoundError:
             return None
-        return Vertex(node)
+        return Edge(edge)
 
     def getEdges(self):
         """Returns an iterator with all the vertices"""
