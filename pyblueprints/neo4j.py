@@ -324,19 +324,19 @@ class Neo4jIndexableGraph(Neo4jGraph):
         @params indexName: The index name
         @params indexClass: vertex or edge
 
-        @return The Index object"""
+        @return The Index object or None"""
         if indexClass == "vertex":
             try:
                 return Index(indexName, indexClass, "manual",
                         self.neograph.nodes.indexes.get(indexName))
-            except neo4jrestclient.request.NotFoundError:
-                raise KeyError("Vertex index %s not found" % indexName)
+            except client.NotFoundError:
+                return None
         elif indexClass == "edge":
             try:
                 return Index(indexName, indexClass, "manual",
                         self.neograph.relationships.indexes.get(indexName))
-            except neo4jrestclient.request.NotFoundError:
-                raise KeyError("Edge index %s not found" % indexName)
+            except client.NotFoundError:
+                return None
         else:
             raise KeyError("Unknown Index Class (%s). Use vertex or edge"\
                     % indexClass)
