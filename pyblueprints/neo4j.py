@@ -217,14 +217,14 @@ class Index():
     Index object"""
 
     def __init__(self, indexName, indexClass, indexType, indexObject):
-        if indexClass != "VERTICES" and indexClass != "EDGES":
+        if indexClass != "vertex" and indexClass != "edge":
             raise NameError("%s is not a valid Index Class" % indexClass)
         self.indexClass = indexClass
         self.indexName = indexName
-        if indexType != "AUTOMATIC" and indexType != "MANUAL":
+        if indexType != "automatic" and indexType != "manual":
             raise NameError("%s is not a valid Index Type" % indexType)
         self.indexType = indexType
-        if not isinstance(indexObject, neo4jrestclient.client.Index):
+        if not isinstance(indexObject, client.Index):
             raise TypeError("""%s is not a valid
                             neo4jrestclient.client.Index
                             instance""" \
@@ -247,13 +247,13 @@ class Index():
         return self.indexName
 
     def getIndexClass(self):
-        """Returns the index class (VERTICES or EDGES)
+        """Returns the index class (vertex or edge)
 
         @returns The index class"""
         return self.indexClass
 
     def getIndexType(self):
-        """Returns the index type (AUTOMATIC or MANUAL)
+        """Returns the index type (automatic or manual)
 
         @returns The index type"""
         return self.indexType
@@ -297,43 +297,48 @@ class Neo4jIndexableGraph(Neo4jGraph):
     for indexable graphs"""
 
     def createManualIndex(self, indexName, indexClass):
-        """TODO Documentation"""
-        raise NotImplementedError("Method has to be implemented")
-
-    def createAutomaticIndex(self, name, indexClass):
-        """Creates an index automatically managed my Neo4j
+        """Creates an index manually managed
         @params name: The index name
-        @params indexClass: VERTICES or EDGES
+        @params indexClass: vertex or edge
 
         @returns The created Index"""
-        if indexClass == "VERTICES":
-            index = self.neograph.nodes.indexes.create(name)
-        elif indexClass == "EDGES":
-            index = self.neograph.relationships.indexes.create(name)
+        indexClass = str(indexClass).lower()
+        if indexClass == "vertex":
+            index = self.neograph.nodes.indexes.create(indexName)
+        elif indexClass == "edge":
+            index = self.neograph.relationships.indexes.create(indexName)
         else:
             NameError("Unknown Index Class %s" % indexClass)
-        return Index(name, indexClass, "AUTOMATIC", index)
+        return Index(indexName, indexClass, "automatic", index)
+
+    def createAutomaticIndex(self, indexName, indexClass):
+        """Creates an index automatically managed my Neo4j
+        @params name: The index name
+        @params indexClass: vertex or edge
+
+        @returns The created Index"""
+        raise NotImplementedError("Method has to be implemented")
 
     def getIndex(self, indexName, indexClass):
         """Retrieves an index with a given index name and class
         @params indexName: The index name
-        @params indexClass: VERTICES or EDGES
+        @params indexClass: vertex or edge
 
         @return The Index object"""
-        if indexClass == "VERTICES":
+        if indexClass == "vertex":
             try:
-                return Index(indexName, indexClass, "AUTOMATIC",
+                return Index(indexName, indexClass, "manual",
                         self.neograph.nodes.indexes.get(indexName))
             except neo4jrestclient.request.NotFoundError:
-                raise KeyError("VERTICES index %s not found" % indexName)
-        elif indexClass == "EDGES":
+                raise KeyError("Vertex index %s not found" % indexName)
+        elif indexClass == "edge":
             try:
-                return Index(indexName, indexClass, "AUTOMATIC",
+                return Index(indexName, indexClass, "manual",
                         self.neograph.relationships.indexes.get(indexName))
             except neo4jrestclient.request.NotFoundError:
-                raise KeyError("EDGES index %s not found" % indexName)
+                raise KeyError("Edge index %s not found" % indexName)
         else:
-            raise KeyError("Unknown Index Class (%s). Use VERTICES or EDGES"\
+            raise KeyError("Unknown Index Class (%s). Use vertex or edge"\
                     % indexClass)
 
     def getIndices(self):
@@ -342,10 +347,10 @@ class Neo4jIndexableGraph(Neo4jGraph):
         @returns A generator function over all rhe Index objects"""
         for indexName in self.neograph.nodes.indexes.keys():
             indexObject = self.neograph.nodes.indexes.get(indexName)
-            yield Index(indexName, "VERTICES", "AUTOMATIC", indexObject)
+            yield Index(indexName, "vertex", "manual", indexObject)
         for indexName in self.neograph.relationships.indexes.keys():
             indexObject = self.neograph.relationships.indexes.get(indexName)
-            yield Index(indexName, "EDGES", "AUTOMATIC", indexObject)
+            yield Index(indexName, "edge", "manual", indexObject)
 
     def dropIndex(self, indexName):
         """TODO Documentation"""
