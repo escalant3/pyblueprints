@@ -160,6 +160,21 @@ class Vertex(Element):
             for edge in self.neoelement.relationships.incoming():
                 yield Edge(edge)
 
+    def getBothEdges(self, label=None):
+        """Gets all the edges of the node. If label
+        parameter is provided, it only returns the edges of
+        the given label
+        @params label: Optional parameter to filter the edges
+
+        @returns A generator function with the incoming edges"""
+        if label:
+            for edge in self.neoelement.relationships.all(types=[label]):
+                yield Edge(edge)
+        else:
+            for edge in self.neoelement.relationships.all():
+                yield Edge(edge)
+
+
     def __str__(self):
         return "Vertex %s: %s" % (self.neoelement.id,
                                 self.neoelement.properties)
