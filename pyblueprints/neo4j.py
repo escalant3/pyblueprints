@@ -36,7 +36,10 @@ class Neo4jGraph(Graph):
         @params _id: Node unique identifier
 
         @returns The requested Vertex or None"""
-        node = self.neograph.nodes.get(_id)
+        try:
+            node = self.neograph.nodes.get(_id)
+        except client.NotFoundError:
+            return None
         return Vertex(node)
 
     def getVertices(self):
@@ -59,6 +62,17 @@ class Neo4jGraph(Graph):
         n2 = inVertex.neoelement
         edge = n1.relationships.create(label, n2)
         return Edge(edge)
+
+    def getEdge(self, _id):
+        """Retrieves an existing edge from the graph
+        @params _id: Edge unique identifier
+
+        @returns The requested Edge or None"""
+        try:
+            edge = self.neograph.nodes.get(_id)
+        except client.NotFoundError:
+            return None
+        return Vertex(node)
 
     def getEdges(self):
         """Returns an iterator with all the vertices"""
