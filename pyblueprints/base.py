@@ -54,6 +54,13 @@ class Graph():
         @returns The created Edge object"""
         raise NotImplementedError("Method has to be implemented")
 
+    def getEdge(self, _id):
+        """Retrieves an existing edge from the graph
+        @params _id: Edge unique identifier
+
+        @returns The requested Edge or None"""
+        raise NotImplementedError("Method has to be implemented")
+
     def getEdges(self):
         """Returns an iterator with all the vertices"""
         raise NotImplementedError("Method has to be implemented")
@@ -147,6 +154,11 @@ class Element():
         @returns The unique identifier of the element"""
         raise NotImplementedError("Method has to be implemented")
 
+    def removeProperty(self, key):
+        """Removes the value of the property for the given key
+        @params key: The key which value is being removed"""
+        raise NotImplementedError("Method has to be implemented")
+
 
 class Vertex(Element):
     """An abstract class defining a Vertex object representing
@@ -158,7 +170,7 @@ class Vertex(Element):
         the given label
         @params label: Optional parameter to filter the edges
 
-        @returns A list of edges"""
+        @returns A generator function of edges"""
         raise NotImplementedError("Method has to be implemented")
 
     def getInEdges(self, label=None):
@@ -167,9 +179,17 @@ class Vertex(Element):
         the given label
         @params label: Optional parameter to filter the edges
 
-        @returns A list of edges"""
+        @returns A generator function of edges"""
         raise NotImplementedError("Method has to be implemented")
 
+    def getBothEdges(self, label=None):
+        """Gets all the edges of the node. If label
+        parameter is provided, it only returns the edges of
+        the given label
+        @params label: Optional parameter to filter the edges
+
+        @returns A generator function of edges"""
+        raise NotImplementedError("Method has to be implemented")
 
 class Edge(Element):
     """An abstract class defining a Edge object representing
