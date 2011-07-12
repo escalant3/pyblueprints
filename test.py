@@ -2,9 +2,9 @@
 #-*- coding:utf-8 -*-
 
 
-##########################################################################
-# This test has been performed with a default rexster-0.4.1 distribution #
-##########################################################################
+###############################################################################
+# This test has been performed with a default neo4j-community-1.3 distribution#
+###############################################################################
 
 import unittest
 from pyblueprints.neo4j import *
