@@ -66,13 +66,16 @@ class RequestServerTestSuite(unittest.TestCase):
     def testElementProperties(self):
         graph= Neo4jGraph(HOST)
         vertex = graph.addVertex()
+        vertex_id = vertex.getId()
         vertex.setProperty('name', 'paquito')
         properties = ['name']
         self.assertEqual(vertex.getPropertyKeys(), properties)
         self.assertEqual(vertex.getProperty('name'), 'paquito')
         vertex.setProperty('name', 'pablito')
+        vertex = graph.getVertex(vertex_id)
         self.assertEqual(vertex.getProperty('name'), 'pablito')
         vertex.removeProperty('name')
+        vertex = graph.getVertex(vertex_id)
         self.assertNotIn('name', vertex.getPropertyKeys())
 
     def testEdgeMethods(self):
