@@ -130,7 +130,7 @@ class Element():
     def removeProperty(self, key):
         """Removes the value of the property for the given key
         @params key: The key which value is being removed"""
-        self.neoelement.properties.pop(key)
+        self.neoelement.delete(key)
 
 
 class Vertex(Element):
