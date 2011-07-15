@@ -17,10 +17,22 @@ from neo4jrestclient import client
 from base import Graph
 
 
+class Neo4jDatabaseConnectionError(Exception):
+
+    def __init__(self, url, *args, **kwargs):
+        self.url = url
+
+    def __str__(self):
+        return "Unable to connect to \"%s\"" % self.url
+
+
 class Neo4jGraph(Graph):
 
     def __init__(self, host):
-        self.neograph = client.GraphDatabase(host)
+        try:
+            self.neograph = client.GraphDatabase(host)
+        except client.NotFoundError:
+            raise Neo4jDatabaseConnectionError(host)
 
     def addVertex(self, _id=None):
         """Add param declared for compability with the API. Neo4j
