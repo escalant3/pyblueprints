@@ -2,4 +2,5 @@
 #-*- coding:utf-8 -*-
 
 # Automatic importation of python-rexster
-from rexster import RexsterServer, RexsterGraph, RexsterIndexableGraph
+from rexster import (RexsterServer, RexsterGraph,
+                    RexsterIndexableGraph, RexsterException)
