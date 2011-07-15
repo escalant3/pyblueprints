@@ -12,7 +12,7 @@ __credits__ = [
     "Javier de la Rosa, https://github.com/versae",
 ]
 __license__ = "GPL 3"
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 __email__ = "escalant3@gmail.com"
 __url__ = "https://github.com/escalant3/pyblueprints"
 __description__ = """A Python version of the Blueprints
