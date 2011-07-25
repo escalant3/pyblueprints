@@ -21,7 +21,7 @@ class RequestServerTestSuite(unittest.TestCase):
         pass
 
     def testGraphInvalidConnection(self):
-        self.assertRaises(client.NotFoundError,
+        self.assertRaises(Neo4jDatabaseConnectionError,
                             Neo4jGraph,
                             'http://invalidurl')
 
