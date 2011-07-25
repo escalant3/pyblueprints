@@ -4,12 +4,6 @@
 #####################################################################
 # A set of classes implementing Blueprints API for Neo4j engine.    #
 #                                                                   #
-# The CulturePlex Laboratory                                        #
-# The University of Western Ontario                                 #
-#                                                                   #
-# Diego Muñoz Escalante (escalant3 at gmail dot com)                #
-# Javier de la Rosa (versae at gmail dot com)                       #
-#                                                                   #
 # File: pyblueprints/neo4j.py                                       #
 #####################################################################
 
@@ -104,7 +98,7 @@ class Neo4jGraph(Graph):
         raise NotImplementedError("Method has to be implemented")
 
 
-class Element():
+class Element(object):
     """An class defining an Element object composed
     by a collection of key/value properties for the
     Neo4j database"""
@@ -367,3 +361,40 @@ class Neo4jIndexableGraph(Neo4jGraph):
     def dropIndex(self, indexName):
         """TODO Documentation"""
         raise NotImplementedError("Method has to be implemented")
+
+
+class Neo4jTransactionalGraph(Neo4jGraph):
+    """An abstract class containing the specific methods
+    for transacional graphs"""
+
+    __transaction = False
+    __txObj = None
+
+    def startTransaction(self):
+        self.__txObj = self.neograph.transaction(commit=False)
+        self.__transaction = True
+
+    def stopTransaction(self):
+        self.__txObj.commit()
+        self.__txObj = None
+        self.__transaction = False
+
+    def __transactionOperation(self, operation, *args, **kwargs):
+        op = getattr(super(Neo4jTransactionalGraph, self), operation)
+        if self.__transaction:
+            with self.__txObj:
+                return op(*args, **kwargs)
+        else:
+            return op(*args, **kwargs)
+
+    def addVertex(self, *args, **kwargs):
+        return self.__transactionOperation('addVertex', *args, **kwargs)
+    
+    def removeVertex(self, *args, **kwargs):
+        return self.__transactionOperation('removeVertex', *args, **kwargs)
+
+    def addEdge(self, *args, **kwargs):
+        return self.__transactionOperation('addEdge', *args, **kwargs)
+
+    def removeEdge(self, *args, **kwargs):
+        return self.__transactionOperation('removeEdge', *args, **kwargs)  

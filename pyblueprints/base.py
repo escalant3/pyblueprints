@@ -7,17 +7,11 @@
 #                                                                   #
 # https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model #
 #                                                                   #
-# The CulturePlex Laboratory                                        #
-# The University of Western Ontario                                 #
-#                                                                   #
-# Diego Muñoz Escalante (escalant3 at gmail dot com)                #
-# Javier de la Rosa (versae at gmail dot com)                       #
-#                                                                   #
 # File: pyblueprints/base.py                                        #
 #####################################################################
 
 
-class Graph():
+class Graph(object):
     """This is an abstract class that specifies all the
     methods that should be reimplemented in order to
     follow a Blueprints-like API in python"""
