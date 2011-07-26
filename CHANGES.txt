@@ -1,6 +1,13 @@
 Changes
 -------
 
+0.5 (2011-07-26)
+----------------
+- Added Transactional operations support
+- Added dropIndex functionality for Neo4j-API
+- Added code examples to documentation
+- Added tests
+
 0.3.2 (2011-07-15)
 ------------------
 - Bugfixes
