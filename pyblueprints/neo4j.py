@@ -218,7 +218,7 @@ class Edge(Element):
                                 self.neoelement.properties)
 
 
-class Index():
+class Index(object):
     """An class containing all the methods needed by an
     Index object"""
 
@@ -279,10 +279,12 @@ class Index():
         @params value: Index value string
         @returns A generator of Vertex or Edge objects"""
         for element in self.neoindex[key][value]:
-            if self.indexClass == "VERTICES":
+            if self.indexClass == "vertex":
                 yield Vertex(element)
-            else:
+            elif self.indexClass == "edge":
                 yield Edge(element)
+            else:
+                raise TypeError(self.indexClass)
 
     def remove(self, key, value, element):
         """Removes an element from an index under a given
@@ -315,7 +317,7 @@ class Neo4jIndexableGraph(Neo4jGraph):
             index = self.neograph.relationships.indexes.create(indexName)
         else:
             NameError("Unknown Index Class %s" % indexClass)
-        return Index(indexName, indexClass, "automatic", index)
+        return Index(indexName, indexClass, "manual", index)
 
     def createAutomaticIndex(self, indexName, indexClass):
         """Creates an index automatically managed my Neo4j
@@ -358,9 +360,9 @@ class Neo4jIndexableGraph(Neo4jGraph):
             indexObject = self.neograph.relationships.indexes.get(indexName)
             yield Index(indexName, "edge", "manual", indexObject)
 
-    def dropIndex(self, indexName):
-        """TODO Documentation"""
-        raise NotImplementedError("Method has to be implemented")
+    def dropIndex(self, indexName, indexClass):
+        index = self.getIndex(indexName, indexClass)
+        index.neoindex.delete()
 
 
 class TransactionalElement(Element):
@@ -387,27 +389,56 @@ class TransactionalElement(Element):
 
 
 class TransactionalVertex(TransactionalElement, Vertex):
-    pass
+
+    def __yieldEdges(self, edges):
+        for edge in edges:
+            yield TransactionalEdge(edge, self._graphContainer)
+
+    def getOutEdges(self, *args, **kwargs):
+        edges = super(TransactionalVertex, self).getOutEdges(*args, **kwargs)
+        return self.__yieldEdges(edges)
+
+    def getInEdges(self, *args, **kwargs):
+        edges = super(TransactionalVertex, self).getInEdges(*args, **kwargs)
+        return self.__yieldEdges(edges)
+
+    def getBothEdges(self, *args, **kwargs):
+        edges = super(TransactionalVertex, self).getBothEdges(*args, **kwargs)
+        return self.__yieldEdges(edges)
 
 
 class TransactionalEdge(TransactionalElement, Edge):
-    pass
+
+    def getOutVertex(self, *args, **kwargs):
+        vertex = super(TransactionalEdge, self).getOutVertex(*args, **kwargs)
+        return TransactionalVertex(vertex, self._graphContainer)
+
+    def getInVertex(self, *args, **kwargs):
+        vertex = super(TransactionalEdge, self).getInVertex(*args, **kwargs)
+        return TransactionalVertex(vertex, self._graphContainer)
 
 
 class TransactionalIndex(Index):
 
-    def __init__(self, index):
+    _graphContainer = None
+
+    def __init__(self, index, graph):
         super(TransactionalIndex, self).__init__(index.indexName,
                                                 index.indexClass,
                                                 index.indexType,
                                                 index.neoindex)
+        self._graphContainer = graph
 
     def get(self, *args, **kwargs):
-        element = super(TransactionalIndex, self).get(*args, **kwargs)
-        if self.indexClass == "VERTICES":
-            return TransactionalVertex(element)
+        elements = super(TransactionalIndex, self).get(*args, **kwargs)
+        if self.indexClass == "vertex":
+            for element in elements:
+                yield TransactionalVertex(element, self._graphContainer)
+        elif self.indexClass == "edge":
+            for element in elements:
+                yield TransactionalEdge(element, self._graphContainer)
         else:
-            return TransactionalEdge(element)
+            raise TypeError(self.indexClass)
 
 
 class Neo4jTransactionalGraph(Neo4jGraph):
@@ -449,8 +480,8 @@ class Neo4jTransactionalGraph(Neo4jGraph):
         edge = self.__transactionalOperation('addEdge', *args, **kwargs)
         return TransactionalEdge(edge, self)
 
-    def removeEdge(self, *args, **kwargs):
-        return self.__transactionalOperation('removeEdge', *args, **kwargs)
+    def getEdge(self, *args, **kwargs):
+        return self.__transactionalOperation('getEdge', *args, **kwargs)
 
     def removeEdge(self, *args, **kwargs):
         return self.__transactionalOperation('removeEdge', *args, **kwargs)  
@@ -460,8 +491,8 @@ class Neo4jTransactionalIndexableGraph(Neo4jTransactionalGraph, Neo4jIndexableGr
 
     def createManualIndex(self, *args, **kwargs):
         index = super(Neo4jTransactionalIndexableGraph, self).createManualIndex(*args, **kwargs)
-        return TransactionalIndex(index) if index else None
+        return TransactionalIndex(index, self) if index else None
 
     def getIndex(self, *args, **kwargs):
         index = super(Neo4jTransactionalIndexableGraph, self).getIndex(*args, **kwargs)
-        return TransactionalIndex(index) if index else None
+        return TransactionalIndex(index, self) if index else None
