@@ -363,38 +363,75 @@ class Neo4jIndexableGraph(Neo4jGraph):
         raise NotImplementedError("Method has to be implemented")
 
 
+class TransactionalElement(Element):
+
+    _graphContainer = None
+
+    def __init__(self, element, graph):
+        super(TransactionalElement, self).__init__(element.neoelement)
+        self._graphContainer = graph
+
+    def __transactionalOperation(self, operation, *args, **kwargs):
+        op = getattr(super(TransactionalElement, self), operation)
+        if self._graphContainer._transaction:
+            with self._graphContainer._txObj:
+                return op(*args, **kwargs)
+        else:
+            return op(*args, **kwargs)
+
+    def setProperty(self, *args, **kwargs):
+        return self.__transactionalOperation('setProperty', *args, **kwargs)
+
+    def removeProperty(self, *args, **kwargs):
+        return self.__transactionalOperation('removeProperty', *args, **kwargs)
+
+
+class TransactionalVertex(TransactionalElement, Vertex):
+    pass
+
+
+class TransactionalEdge(TransactionalElement, Edge):
+    pass
+
+
 class Neo4jTransactionalGraph(Neo4jGraph):
-    """An abstract class containing the specific methods
+    """An class containing the specific methods
     for transacional graphs"""
 
-    __transaction = False
-    __txObj = None
+    _transaction = False
+    _txObj = None
 
     def startTransaction(self):
-        self.__txObj = self.neograph.transaction(commit=False)
-        self.__transaction = True
+        self._txObj = self.neograph.transaction(commit=False)
+        self._transaction = True
 
     def stopTransaction(self):
-        self.__txObj.commit()
-        self.__txObj = None
-        self.__transaction = False
+        self._txObj.commit()
+        self._txObj = None
+        self._transaction = False
 
-    def __transactionOperation(self, operation, *args, **kwargs):
+    def __transactionalOperation(self, operation, *args, **kwargs):
         op = getattr(super(Neo4jTransactionalGraph, self), operation)
-        if self.__transaction:
-            with self.__txObj:
+        if self._transaction:
+            with self._txObj:
                 return op(*args, **kwargs)
         else:
             return op(*args, **kwargs)
 
     def addVertex(self, *args, **kwargs):
-        return self.__transactionOperation('addVertex', *args, **kwargs)
+        vertex = self.__transactionalOperation('addVertex', *args, **kwargs)
+        return TransactionalVertex(vertex, self)
+
+    def getVertex(self, *args, **kwargs):
+        vertex = self.__transactionalOperation('getVertex', *args, **kwargs)
+        return TransactionalVertex(vertex, self) if vertex else None
     
     def removeVertex(self, *args, **kwargs):
-        return self.__transactionOperation('removeVertex', *args, **kwargs)
+        return self.__transactionalOperation('removeVertex', *args, **kwargs)
 
     def addEdge(self, *args, **kwargs):
-        return self.__transactionOperation('addEdge', *args, **kwargs)
+        edge = self.__transactionalOperation('addEdge', *args, **kwargs)
+        return TransactionalEdge(edge, self)
 
     def removeEdge(self, *args, **kwargs):
-        return self.__transactionOperation('removeEdge', *args, **kwargs)  
+        return self.__transactionalOperation('removeEdge', *args, **kwargs)  

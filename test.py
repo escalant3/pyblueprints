@@ -93,8 +93,7 @@ class RequestServerTestSuite(unittest.TestCase):
         self.assertEqual(inVertex.getId(), _id2)
         self.assertEqual(edge.getLabel(), 'myLabel')
 
-"""
-TODO when API is able to delete indexes
+    @unittest.skip("TODO")
     def testAddRemoveManualIndex(self):
         graph= Neo4jIndexableGraph(HOST)
         index = graph.createManualIndex('myManualIndex', 'vertex')
@@ -107,9 +106,11 @@ TODO when API is able to delete indexes
                             'myManualIndex',
                             'vertex')
     
+    @unittest.skip("TODO")
     def testAddRemoveAutomaticIndex(self):
         pass
 
+    @unittest.skip("TODO")
     def testIndexing(self):
         graph= Neo4jIndexableGraph(HOST)
         index = graph.createManualIndex('myManualIndex', 'vertex')
@@ -125,6 +126,33 @@ TODO when API is able to delete indexes
         index.remove('key1', 'value1', vertex)
         self.assertEqual(index.count('key1', 'value1'), 0)
         graph.dropIndex('myManualIndex')
-"""
+
+    def testTransactionalMethods(self):
+        graph= Neo4jTransactionalGraph(HOST)
+        graph.startTransaction()
+        v = graph.addVertex()
+        self.assertRaises(AttributeError, v.getId)
+        graph.stopTransaction()
+        vertexId = v.getId()
+        self.assertEqual(type(vertexId), int)
+        #graph.startTransaction()
+        #graph.removeVertex(v)
+        #self.assertEqual(type(v.getId()), int)
+        #graph.stopTransaction()
+        v = graph.getVertex(vertexId)
+        self.assertIsInstance(v, TransactionalVertex)
+        graph.startTransaction()
+        v.setProperty('p1', 'v1')
+        self.assertNotIn('p1', v.getPropertyKeys())
+        graph.stopTransaction()
+        self.assertIn('p1', v.getPropertyKeys())
+        graph.startTransaction()
+        v.removeProperty('p1')
+        self.assertIn('p1', v.getPropertyKeys())
+        graph.stopTransaction()
+        self.assertNotIn('p1', v.getPropertyKeys())
+
+
+
 if __name__ == "__main__":
     unittest.main()
