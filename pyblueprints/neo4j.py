@@ -394,6 +394,22 @@ class TransactionalEdge(TransactionalElement, Edge):
     pass
 
 
+class TransactionalIndex(Index):
+
+    def __init__(self, index):
+        super(TransactionalIndex, self).__init__(index.indexName,
+                                                index.indexClass,
+                                                index.indexType,
+                                                index.neoindex)
+
+    def get(self, *args, **kwargs):
+        element = super(TransactionalIndex, self).get(*args, **kwargs)
+        if self.indexClass == "VERTICES":
+            return TransactionalVertex(element)
+        else:
+            return TransactionalEdge(element)
+
+
 class Neo4jTransactionalGraph(Neo4jGraph):
     """An class containing the specific methods
     for transacional graphs"""
@@ -434,4 +450,18 @@ class Neo4jTransactionalGraph(Neo4jGraph):
         return TransactionalEdge(edge, self)
 
     def removeEdge(self, *args, **kwargs):
+        return self.__transactionalOperation('removeEdge', *args, **kwargs)
+
+    def removeEdge(self, *args, **kwargs):
         return self.__transactionalOperation('removeEdge', *args, **kwargs)  
+
+
+class Neo4jTransactionalIndexableGraph(Neo4jTransactionalGraph, Neo4jIndexableGraph):
+
+    def createManualIndex(self, *args, **kwargs):
+        index = super(Neo4jTransactionalIndexableGraph, self).createManualIndex(*args, **kwargs)
+        return TransactionalIndex(index) if index else None
+
+    def getIndex(self, *args, **kwargs):
+        index = super(Neo4jTransactionalIndexableGraph, self).getIndex(*args, **kwargs)
+        return TransactionalIndex(index) if index else None
