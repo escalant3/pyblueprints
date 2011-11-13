@@ -9,7 +9,7 @@ from distutils.core import setup
 
 __author__ = "Diego Muñoz Escalante"
 __license__ = "GPL 3"
-__version__ = "0.5"
+__version__ = "0.5.1"
 __email__ = "escalant3@gmail.com"
 __url__ = "https://github.com/escalant3/pyblueprints"
 __description__ = """A Python version of the Blueprints

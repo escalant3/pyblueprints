@@ -1,6 +1,10 @@
 Changes
 -------
 
+0.5.1 (2011-11-13)
+------------------
+- Transactions refactored delegating management to the restclient
+
 0.5 (2011-07-26)
 ----------------
 - Added Transactional operations support
