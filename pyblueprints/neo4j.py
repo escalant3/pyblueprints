@@ -27,6 +27,8 @@ class Neo4jGraph(Graph):
             self.neograph = client.GraphDatabase(host)
         except client.NotFoundError:
             raise Neo4jDatabaseConnectionError(host)
+        except ValueError:
+            raise Neo4jDatabaseConnectionError(host)
 
     def addVertex(self, _id=None):
         """Add param declared for compability with the API. Neo4j
@@ -365,82 +367,6 @@ class Neo4jIndexableGraph(Neo4jGraph):
         index.neoindex.delete()
 
 
-class TransactionalElement(Element):
-
-    _graphContainer = None
-
-    def __init__(self, element, graph):
-        super(TransactionalElement, self).__init__(element.neoelement)
-        self._graphContainer = graph
-
-    def __transactionalOperation(self, operation, *args, **kwargs):
-        op = getattr(super(TransactionalElement, self), operation)
-        if self._graphContainer._transaction:
-            with self._graphContainer._txObj:
-                return op(*args, **kwargs)
-        else:
-            return op(*args, **kwargs)
-
-    def setProperty(self, *args, **kwargs):
-        return self.__transactionalOperation('setProperty', *args, **kwargs)
-
-    def removeProperty(self, *args, **kwargs):
-        return self.__transactionalOperation('removeProperty', *args, **kwargs)
-
-
-class TransactionalVertex(TransactionalElement, Vertex):
-
-    def __yieldEdges(self, edges):
-        for edge in edges:
-            yield TransactionalEdge(edge, self._graphContainer)
-
-    def getOutEdges(self, *args, **kwargs):
-        edges = super(TransactionalVertex, self).getOutEdges(*args, **kwargs)
-        return self.__yieldEdges(edges)
-
-    def getInEdges(self, *args, **kwargs):
-        edges = super(TransactionalVertex, self).getInEdges(*args, **kwargs)
-        return self.__yieldEdges(edges)
-
-    def getBothEdges(self, *args, **kwargs):
-        edges = super(TransactionalVertex, self).getBothEdges(*args, **kwargs)
-        return self.__yieldEdges(edges)
-
-
-class TransactionalEdge(TransactionalElement, Edge):
-
-    def getOutVertex(self, *args, **kwargs):
-        vertex = super(TransactionalEdge, self).getOutVertex(*args, **kwargs)
-        return TransactionalVertex(vertex, self._graphContainer)
-
-    def getInVertex(self, *args, **kwargs):
-        vertex = super(TransactionalEdge, self).getInVertex(*args, **kwargs)
-        return TransactionalVertex(vertex, self._graphContainer)
-
-
-class TransactionalIndex(Index):
-
-    _graphContainer = None
-
-    def __init__(self, index, graph):
-        super(TransactionalIndex, self).__init__(index.indexName,
-                                                index.indexClass,
-                                                index.indexType,
-                                                index.neoindex)
-        self._graphContainer = graph
-
-    def get(self, *args, **kwargs):
-        elements = super(TransactionalIndex, self).get(*args, **kwargs)
-        if self.indexClass == "vertex":
-            for element in elements:
-                yield TransactionalVertex(element, self._graphContainer)
-        elif self.indexClass == "edge":
-            for element in elements:
-                yield TransactionalEdge(element, self._graphContainer)
-        else:
-            raise TypeError(self.indexClass)
-
-
 class Neo4jTransactionalGraph(Neo4jGraph):
     """An class containing the specific methods
     for transacional graphs"""
@@ -454,45 +380,10 @@ class Neo4jTransactionalGraph(Neo4jGraph):
 
     def stopTransaction(self):
         self._txObj.commit()
+        self._txObj.__exit__(None, None, None)
         self._txObj = None
         self._transaction = False
 
-    def __transactionalOperation(self, operation, *args, **kwargs):
-        op = getattr(super(Neo4jTransactionalGraph, self), operation)
-        if self._transaction:
-            with self._txObj:
-                return op(*args, **kwargs)
-        else:
-            return op(*args, **kwargs)
-
-    def addVertex(self, *args, **kwargs):
-        vertex = self.__transactionalOperation('addVertex', *args, **kwargs)
-        return TransactionalVertex(vertex, self)
-
-    def getVertex(self, *args, **kwargs):
-        vertex = self.__transactionalOperation('getVertex', *args, **kwargs)
-        return TransactionalVertex(vertex, self) if vertex else None
-    
-    def removeVertex(self, *args, **kwargs):
-        return self.__transactionalOperation('removeVertex', *args, **kwargs)
-
-    def addEdge(self, *args, **kwargs):
-        edge = self.__transactionalOperation('addEdge', *args, **kwargs)
-        return TransactionalEdge(edge, self)
-
-    def getEdge(self, *args, **kwargs):
-        return self.__transactionalOperation('getEdge', *args, **kwargs)
-
-    def removeEdge(self, *args, **kwargs):
-        return self.__transactionalOperation('removeEdge', *args, **kwargs)  
-
 
 class Neo4jTransactionalIndexableGraph(Neo4jTransactionalGraph, Neo4jIndexableGraph):
-
-    def createManualIndex(self, *args, **kwargs):
-        index = super(Neo4jTransactionalIndexableGraph, self).createManualIndex(*args, **kwargs)
-        return TransactionalIndex(index, self) if index else None
-
-    def getIndex(self, *args, **kwargs):
-        index = super(Neo4jTransactionalIndexableGraph, self).getIndex(*args, **kwargs)
-        return TransactionalIndex(index, self) if index else None
+    pass

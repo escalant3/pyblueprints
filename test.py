@@ -121,21 +121,27 @@ class RequestServerTestSuite(unittest.TestCase):
         self.assertEqual(index.count('key1', 'value1'), 0)
         graph.dropIndex('myManualIndex', 'vertex')
 
+
     def testTransactionalMethods(self):
         graph= Neo4jTransactionalGraph(HOST)
         graph.startTransaction()
         v = graph.addVertex()
         self.assertRaises(AttributeError, v.getId)
+        v2 = graph.addVertex()
         graph.stopTransaction()
         vertexId = v.getId()
         self.assertEqual(type(vertexId), int)
         v = graph.getVertex(vertexId)
-        self.assertIsInstance(v, TransactionalVertex)
+        self.assertIsInstance(v, Vertex)
         graph.startTransaction()
         v.setProperty('p1', 'v1')
         self.assertNotIn('p1', v.getPropertyKeys())
+        v.setProperty('p2', 'v2')
+        self.assertNotIn('p1', v.getPropertyKeys())
+        self.assertNotIn('p2', v.getPropertyKeys())
         graph.stopTransaction()
         self.assertIn('p1', v.getPropertyKeys())
+        self.assertIn('p2', v.getPropertyKeys())
         graph.startTransaction()
         v.removeProperty('p1')
         self.assertIn('p1', v.getPropertyKeys())
@@ -145,7 +151,7 @@ class RequestServerTestSuite(unittest.TestCase):
         graph.removeVertex(v)
         self.assertEqual(type(v.getId()), int)
         graph.stopTransaction()
- 
+
     def testTransactionalIndexableMethods(self):
         graph= Neo4jTransactionalIndexableGraph(HOST)
         graph.startTransaction()
@@ -157,7 +163,7 @@ class RequestServerTestSuite(unittest.TestCase):
         index = graph.createManualIndex('myManualIndex', 'vertex')
         index.put('k1', 'v1', v)
         v = list(index.get('k1', 'v1'))[0]
-        self.assertIsInstance(v, TransactionalVertex)
+        self.assertIsInstance(v, Vertex)
         graph.startTransaction()
         v.setProperty('p1', 'v1')
         self.assertNotIn('p1', v.getPropertyKeys())
@@ -172,37 +178,6 @@ class RequestServerTestSuite(unittest.TestCase):
         graph.removeVertex(v)
         self.assertEqual(type(v.getId()), int)
         graph.stopTransaction()
- 
-    def testTransactionalVertexMethods(self):
-        graph= Neo4jTransactionalGraph(HOST)
-        v1 = graph.addVertex()
-        v2 = graph.addVertex()
-        newEdge = graph.addEdge(v1, v2, 'myLabel')
-        _id = v1.getId()
-        vertex = graph.getVertex(_id)
-        self.assertIsInstance(vertex, TransactionalVertex)
-        self.assertEqual(vertex.getId(), _id)
-        edge = list(vertex.getBothEdges())[0]
-        self.assertIsInstance(edge, TransactionalEdge)
-        edge = list(vertex.getOutEdges())[0]
-        self.assertIsInstance(edge, TransactionalEdge)
-        edges = list(vertex.getInEdges())
-        self.assertEqual(edges, [])
-
-    def testTransactionalEdgeMethods(self):
-        graph= Neo4jTransactionalGraph(HOST)
-        v1 = graph.addVertex()
-        v2 = graph.addVertex()
-        _id1 = v1.getId()
-        _id2 = v2.getId()
-        edge = graph.addEdge(v1, v2, 'myLabel')
-        outVertex = edge.getOutVertex()
-        self.assertIsInstance(outVertex, TransactionalVertex)
-        self.assertEqual(outVertex.getId(), _id1)
-        inVertex = edge.getInVertex()
-        self.assertIsInstance(inVertex, TransactionalVertex)
-        self.assertEqual(inVertex.getId(), _id2)
-        self.assertEqual(edge.getLabel(), 'myLabel')
 
 if __name__ == "__main__":
     unittest.main()
