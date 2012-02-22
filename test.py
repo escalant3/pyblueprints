@@ -3,7 +3,7 @@
 
 
 ###############################################################################
-# This test has been performed with a default neo4j-community-1.4 distribution#
+# This test has been performed with a default neo4j-community-1.6 distribution#
 ###############################################################################
 
 import unittest
