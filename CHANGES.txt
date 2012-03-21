@@ -1,6 +1,10 @@
 Changes
 -------
 
+0.5.2 (2012-03-21)
+------------------
+- Updated requirements file
+
 0.5.1 (2011-11-13)
 ------------------
 - Transactions refactored delegating management to the restclient
