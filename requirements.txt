@@ -2,7 +2,7 @@ httplib2==0.7.2
 ipdb==0.6.1
 ipython==0.12
 lucene-querybuilder==0.1.5
-neo4jrestclient==1.6.0
+neo4jrestclient==1.6.1
 python-rexster==0.1.1
 readline==6.2.1
 requests==0.5.0
