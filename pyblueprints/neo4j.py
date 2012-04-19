@@ -126,8 +126,15 @@ class Element(object):
     def setProperty(self, key, value):
         """Sets the property of the element to the given value
         @params key: The property key to set
-        @params value: The value to set"""
+        @params value: The value to set. """
         self.neoelement.set(key, value)
+
+    def setProperties(self, new_dict):
+        element_properties = self.neoelement.properties.copy()
+        for key, value in new_dict.iteritems():
+            new_dict[key] = unicode(value)
+        element_properties.update(new_dict)
+        self.neoelement.properties = element_properties
 
     def getId(self):
         """Returns the unique identifier of the element
