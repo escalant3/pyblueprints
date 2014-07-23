@@ -4,7 +4,7 @@ pyblueprints
 :synopsis: Provides a layer to abstract the Python developer from the graph database system used
 
 Following the set of interfaces provided by tinkerpop for Blueprints,
-this proyect aims to give Python developers a similar functionality.
+this project aims to give Python developers a similar functionality.
 A set of abstract classes are defined in order to guide the design of
 implementations for the different graph database engines.
 
