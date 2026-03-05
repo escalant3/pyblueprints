@@ -6,5 +6,5 @@ neo4jrestclient==1.6.1
 python-rexster==0.1.1
 readline==6.2.1
 requests==2.20.0
-simplejson==2.1.6
+simplejson==2.6.1
 wsgiref==0.1.2
